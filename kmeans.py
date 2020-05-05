@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 import nltk
 import regex as re
 from sklearn.feature_extraction.text import CountVectorizer
+from datetime import datetime
 
 
 stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "said"]
@@ -67,11 +68,24 @@ for i in range(len(kResults)):
     clusters[cIndex].append(files[i])
     clusterText[cIndex].append(cleanText[i])
 
+# Convert date string to julian date
+def datestdtojd (stddate):
+    fmt='%Y-%m-%d'
+    sdtdate = datetime.strptime(stddate, fmt)
+    sdtdate = sdtdate.timetuple()
+    jdate = sdtdate.tm_yday
+    return(jdate)
+
 #print out the titles in each cluster
+average_jdates = []
 for cI in range(0,len(clusters)):
+    jdate = 0
     print("Cluster ", cI)
     for article in clusters[cI]:
         print(article["title"])
+        jdate += datestdtojd(article["date_publish"][0:10])  # we have hh:mm:ss, could be more precise
+    average_jdate = jdate/len(clusters[cI]) #what's a better way to represent date of each cluster?
+    average_jdates.append(average_jdate)
     print()
     print()
     print()
@@ -114,6 +128,7 @@ def printKeywords(arrOfText):
 for cIn in range(0,len(clusterText)):
     print("Cluster "+ str(cIn))
     print(" ", len(clusterText[cIn]), " articles")
+    print("Average Julian day of Cluster", average_jdates[cIn])
     print("Keywords:")
     printKeywords(clusterText[cIn])
     print()

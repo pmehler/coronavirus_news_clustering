@@ -18,20 +18,20 @@ def find_clusters(X, n_clusters, rseed=2):
     rng = np.random.RandomState(rseed)
     i = rng.permutation(X.shape[0])[:n_clusters]
     centers = X[i]
-    
+
     while True:
         # Assign labels based on closest center
         labels = pairwise_distances_argmin(X, centers)
-        
+
         # Find new centers from means of points
         new_centers = np.array([X[labels == i].mean(0)
                                 for i in range(n_clusters)])
-        
+
         # Check for convergence
         if np.all(centers == new_centers):
             break
         centers = new_centers
-        
+
     # Compute Error
     dis_arr = np.array([])
     for i in range(n_clusters):
@@ -39,11 +39,11 @@ def find_clusters(X, n_clusters, rseed=2):
         for j in range(len(X[labels == i])):
             # sum distance between each vector and respective center
             n += distance.euclidean(X[labels == i][j],centers[i])**2
-        dis_arr = np.append(dis_arr, n)    
+        dis_arr = np.append(dis_arr, n)
         #print("cluster:",i,"Distortion:", distortion[i])
-    
+
     #print("total distortion:", np.sum(distortion))
-    return centers, labels, np.sum(dis_arr)
+    return centers, labels, dis_arr
 
 # centers, labels, distortion = find_clusters(X, 3)
 # plt.scatter(X[:, 0], X[:, 1], c=labels,
@@ -55,7 +55,7 @@ def find_clusters(X, n_clusters, rseed=2):
 #     centers, labels, distortion = find_clusters(X, i)
 #     #print(distortion)
 #     dis_arr = np.append(dis_arr, distortion)
-    
+
 # plt.figure()
 # plt.plot(dis_arr)
 # plt.title('Elbow: Distortion (WCSS) vs. K')

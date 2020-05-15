@@ -21,15 +21,13 @@ from sklearn.decomposition import PCA
 
 ############ - TODO, Ideally by Thursday Morning - ##################
 #Priority List:
-# merge
 # compare clustering methods
 
-stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "said"]
+stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "said", "coronavirus", "covid19", "covid"]
 
-#kmeans, hierarchical, comparison
-mode = "hierarchical"
-folderName="testfiles"
-numClusters = 3 #12
+mode = "kmeans" #kmeans, hierarchical, both
+folderName="covid_news_files"
+numClusters = 12
 
 
 def loadFiles(foldername, files):
@@ -72,8 +70,9 @@ def vectorize(cleanText):
     tv = TfidfVectorizer(min_df=0., max_df=1., use_idf=True, max_features=8192)
     tv_matrix = tv.fit_transform(cleanText)
     tv_matrix = tv_matrix.toarray()
+    wordList = tv.get_feature_names()
     mat = np.array(tv_matrix) #holds tfidf vals for each word in each document
-    return mat
+    return mat, wordList
 
 
 def runKMeans(mat, numClusters):
@@ -85,7 +84,6 @@ def runKMeans(mat, numClusters):
 def runHierarchical(mat, numClusters, files):
     '''
     '''
-    print('running h')
     return hCluster(mat, numClusters, files)
 
 
@@ -128,8 +126,28 @@ def printKeywords(arrOfText):
     for wordi in sortedCount:
         if(len(keywords)<5):
             keywords.append(wordi)
-    for keyword in keywords:
-        print("    ", keyword, ": ", counts[keyword])
+    print("    ", ", ".join(keywords))
+
+
+
+
+def printTFIDFKeywords(cluster, mat):
+    ''' param is list of file dicts
+        prints keywords with highest mean tf-idf score in given cluster
+    '''
+    if len(cluster)==0:
+        return
+    words = np.zeros((1, mat.shape[1]))
+    #uses mat, wordlist
+    for doc in cluster:
+        index = doc["index"]
+        words += mat[index]
+    avgTFIDF = words/len(cluster)
+    sortedIndices = np.argsort(avgTFIDF)[0][::-1]
+    topKeywords = []
+    for i in range(5):
+        topKeywords.append(wordList[sortedIndices[i]])
+    print("    ", ", ".join(topKeywords))
 
 
 
@@ -140,10 +158,7 @@ def printKeywords(arrOfText):
 
 
 
-
-
-
-def outputResults(results, distortion, centers):
+def outputResults(results, distortion, centers, numFiles):
     '''
     '''
     #partition files by assigned cluster
@@ -154,9 +169,9 @@ def outputResults(results, distortion, centers):
         clusterText.append([])
     for i in range(len(results)):
         cIndex = results[i]
+        files[i]["index"] = i
         clusters[cIndex].append(files[i])
         clusterText[cIndex].append(cleanText[i])
-    print("total distortion is ", np.sum(distortion))
     #print out the titles in each cluster
     titles = []
     average_jdates = []
@@ -181,6 +196,9 @@ def outputResults(results, distortion, centers):
         print()
         print()
 
+    print("Overall distortion is ", np.sum(distortion))
+    print("Average overall distortion is ", np.sum(distortion)/numFiles)
+
     #print out top 5 occuring keywords per cluster
     for cIn in range(0,len(clusterText)):
         print("Cluster "+ str(cIn))
@@ -190,15 +208,17 @@ def outputResults(results, distortion, centers):
         print("  Average Julian day", average_jdates[cIn])
         print("  Title closest to center:")
         print("    ", clusters[cIn][titles[cIn]]["title"])
-        print("  Keywords:")
+        print("  Top occurring keywords:")
         printKeywords(clusterText[cIn])
+        print("  Highest mean tf-idf Keywords:")
+        printTFIDFKeywords(clusters[cIn], mat)
         print()
 
 
 
 
 
-##################################### check for args here
+##################################### check for args here ########
 
 files = []
 loadFiles(folderName, files)
@@ -206,19 +226,22 @@ loadFiles(folderName, files)
 cleanText = []
 preprocessText(files, cleanText)
 
-mat = vectorize(cleanText)
+wordList = []
+mat, wordList = vectorize(cleanText)
+
+numfiles = len(files)
 
 if mode == "kmeans":
     centers, kResults, distortion = runKMeans(mat, numClusters)
-    outputResults(kResults, distortion, centers)
+    outputResults(kResults, distortion, centers, numfiles)
 elif mode == "hierarchical":
     centers, kResults, distortion = runHierarchical(mat, numClusters, files)
-    outputResults(kResults, distortion, centers)
+    outputResults(kResults, distortion, centers, numfiles)
 else: #default both
-    #centers, results, distortion = runKMeans(mat, numClusters)
-    results = runHierarchical(mat, numClusters)
-    #output comparison
-
+    centers, kResults, distortion = runHierarchical(mat, numClusters, files)
+    outputResults(kResults, distortion, centers, numfiles)
+    centers, kResults, distortion = runKMeans(mat, numClusters)
+    outputResults(kResults, distortion, centers, numfiles)
 
 
 

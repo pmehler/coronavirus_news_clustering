@@ -13,15 +13,9 @@ from scipy.spatial.distance import pdist
 
 
 def hCluster(mat, k, files):
-    #ward is a distance measure between clusters
-    #also could use euclidean, cosine
-    #this is like single
     #'single'
     #'complete'
     #'average'
-    #c, coph_dists = cophenet(Z, pdist(docMat))
-
-
     Z = linkage(mat, 'ward')
     clusterAssignments = fcluster(Z, k, criterion='maxclust')
     clusterAssignments-=1
@@ -37,13 +31,6 @@ def hCluster(mat, k, files):
     #showTree(Z, files)
 
     return centroids, clusterAssignments, distortionByCluster
-#
-#
-# distortionByCluster = []
-# if alg == "hierarchical":
-#     calculateSSE(distortionByCluster)
-# elif alg == "kmeans":
-#     calculateDistortion(distortionByCluster)
 
 
 def determineCentroids(centroids, clusterAssignments, numClusters, mat):
@@ -58,35 +45,6 @@ def determineCentroids(centroids, clusterAssignments, numClusters, mat):
         centroids.append(mean)
 
 
-
-
-
-
-
-#
-# def calculateDistortion(clusters, distortionByCluster):
-#     global clusters
-#     totalDistortion = 0
-#     for cI in range(numClusters):
-#         distortionByCluster.append(0)
-#     numDocs = len(clusterAssignments)
-#     #use mat to get ifidf, centroids array
-#     for cI in range(numClusters):
-#         cVecs = []
-#         for i in range(len(clusterAssignments)):
-#             if clusterAssignments[i]==cI:
-#                 cVecs.append(mat[i])
-#         centr = centroids[cI].reshape(1, -1)
-#         dis = pairwise_distances(centr, cVecs, metric='euclidean')
-#         for val in dis[0]:
-#             distortionByCluster[cI]+=val**2
-#             totalDistortion+=val**2
-#
-#     for t in range(len(distortionByCluster)):
-#         distortionByCluster[t] /= len(clusters[t])
-#     total = totalDistortion/numDocs
-#     print("Total distortion is ", totalDistortion)
-#     print("Distortion is ", total)
 
 
 

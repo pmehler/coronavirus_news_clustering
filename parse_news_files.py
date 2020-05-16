@@ -16,6 +16,10 @@ for subdir, dirs, files in os.walk(raw_folder_path):
 				d = json.load(f)
 				# Make sure articles have a date and are not empty
 				if (d['date_publish'] is not None and d['maintext'] is not None):
+					# filter by keyword
+					# matches = ["corona", "covid", "virus"]
+					# text = d['maintext'].lower()
+					# if any(word in text for word in matches):
 					date = d['date_publish'][0:10]
 					title = d['title']
 					date = date.replace(" ", "")
@@ -26,23 +30,3 @@ for subdir, dirs, files in os.walk(raw_folder_path):
 					os.rename(os.path.join(subdir, file), renamed_folder_path + date + '_' + news_agency + '_' + title + '.json')
 
 print("done")
-'''
-filter for coronavirus news:
-for subdir, dirs, files in os.walk(raw_folder_path):
-	for file in files:
-		if(file != '.DS_Store'):
-			news_agency = os.path.basename(subdir)
-			with open(os.path.join(subdir, file), 'r') as f:
-				d = json.load(f)
-				if (d['date_publish'] is not None and d['maintext'] is not None):
-					matches = ["corona", "covid", "virus"]
-					text = d['maintext'].lower()
-					if any(word in text for word in matches):
-						date = d['date_publish'][0:10]
-						title = d['title']
-						date = date.replace(" ", "")
-						title = title.replace(" ", "")
-						title = title.replace("/", "")
-						print('PATH: ' + os.path.join(subdir, file))
-						os.rename(os.path.join(subdir, file), renamed_folder_path + date + '_' + news_agency + '_' + title + '.json')
-'''

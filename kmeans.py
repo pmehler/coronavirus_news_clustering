@@ -18,14 +18,9 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 
 
+stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "said", "coronavirus", "covid19", "covid", "cnn", "ap"]
 
-############ - TODO, Ideally by Thursday Morning - ##################
-#Priority List:
-# compare clustering methods
-
-stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "said", "coronavirus", "covid19", "covid"]
-
-mode = "kmeans" #kmeans, hierarchical, both
+mode = "both" #kmeans, hierarchical, both
 folderName="covid_news_files"
 numClusters = 12
 
@@ -251,8 +246,7 @@ else: #default both
 
 
 
-########################## kmeans elbow #########################
-
+########################## kmeans elbow #####################################
 # dis_arr = np.array([])
 # for numClusters in range(1,25):
 #     print(numClusters, "of 25")
@@ -264,8 +258,7 @@ else: #default both
 # plt.plot(dis_arr)
 # plt.title('Elbow: Distortion (WCSS) vs. K')
 # plt.show()
-
-#################################################################
+#############################################################################
 
 
 
@@ -288,3 +281,15 @@ else: #default both
 # plt.title('t-SNE with Kmeans Labels')
 # plt.savefig("improved_cluster_tsne.png")
 # plt.show()
+############################################################################
+
+
+
+############################ Sources #######################################
+# https://towardsdatascience.com/understanding-feature-engineering-part-3-traditional-methods-for-text-data-f6f7d70acd41
+# https://kavita-ganesan.com/tfidftransformer-tfidfvectorizer-usage-differences/
+# https://pathmind.com/wiki/bagofwords-tf-idf
+# https://rafatieppo.github.io/post/2018_12_01_juliandate/
+# https://jakevdp.github.io/PythonDataScienceHandbook/05.11-k-means.html
+# https://github.com/fhamborg/news-please
+############################################################################

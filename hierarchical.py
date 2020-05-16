@@ -16,7 +16,7 @@ def hCluster(mat, k, files):
     #'single'
     #'complete'
     #'average'
-    Z = linkage(mat, 'ward')
+    Z = linkage(mat, 'average')
     clusterAssignments = fcluster(Z, k, criterion='maxclust')
     clusterAssignments-=1
 
